@@ -86,12 +86,14 @@ Public Class ucTextDrop2
         End With
 
         With tbSearch
+            .ForeColor = Color.Red
             .Location = New System.Drawing.Point(3, 3)
             .Name = "sTB"
             .Size = New System.Drawing.Size(334, 20)
-            Size = tb.Size
+            '.Size = tb.Size
             .TabIndex = 0
             .Text = "Search here"
+            '.Dock = DockStyle.Fill
         End With
 
         With dgv
