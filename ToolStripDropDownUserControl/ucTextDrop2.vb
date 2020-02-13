@@ -18,16 +18,39 @@ Public Class ucTextDrop2
             .Columns.Add("sn", "sn")
             .Columns.Add("sName", "Name")
             .Columns.Add("sAge", "Age")
-            .Rows.Add()
-            .Size = New Size(360, 200)
+
             '.DataSource = Nothing
             '.DataSource = GridDataSource
-
             '.Dock = DockStyle.Fill
         End With
 
         Build_SearchControls()
 
+        'dgv.DataSource = Nothing
+        'dgv.DataSource = GridDataSource
+    End Sub
+
+    Private Sub BuildDataTable1()
+        GridDataSource = New DataTable
+        With GridDataSource
+            With .Columns
+                .Add("SN")
+                .Add("First Name")
+                .Add("Second Name")
+            End With
+            For i As Integer = 1 To 5
+                .Rows.Add({i, $"Person {i}", $"Surname {i * 10}"})
+            Next
+        End With
+    End Sub
+
+    Private Sub BuildGrid(ByVal kword As String)
+        With dgv
+            .Rows.Clear()
+            For i As Integer = 1 To 5
+                .Rows.Add({i, $"{kword} {i}", $"{kword} {i * 10}"})
+            Next
+        End With
     End Sub
 
     Private Sub Build_SearchControls()
@@ -47,6 +70,7 @@ Public Class ucTextDrop2
             .Location = New System.Drawing.Point(3, 3)
             .Name = "sTB"
             .Size = New System.Drawing.Size(334, 20)
+            Size = tb.Size
             .TabIndex = 0
             .Text = "Search here"
         End With
@@ -69,21 +93,6 @@ Public Class ucTextDrop2
 
 
     End Sub
-
-    Private Sub tb_GotFocus(sender As Object, e As EventArgs) Handles tb.GotFocus
-        Debug.Print("tb_GotFocus")
-    End Sub
-
-    'Private Sub tbSearch_TextChanged(sender As Object, e As EventArgs) Handles tbSearch.TextChanged
-    '    'Dim kword As String = tbSearch.Text
-    '    'If GridDataSource IsNot Nothing Then
-    '    '    Dim F As DataRow() = GridDataSource.Select($"Person LIKE '%{kword}%'")
-    '    '    If F IsNot Nothing AndAlso F.Count > 0 Then
-    '    '        Grid.DataSource = Nothing
-    '    '        Grid.DataSource = F.CopyToDataTable
-    '    '    End If
-    '    'End If
-    'End Sub
 
     Private Sub tsDropDown_Closing(sender As Object, e As ToolStripDropDownClosingEventArgs) Handles tsDropDown.Closing
         'e.Cancel = Not (e.CloseReason = ToolStripDropDownCloseReason.CloseCalled OrElse e.CloseReason = ToolStripDropDownCloseReason.AppFocusChange)
@@ -111,6 +120,18 @@ Public Class ucTextDrop2
             tbSearch.SelectionStart = tbSearch.Text.Length
         End If
 
+    End Sub
+
+    Private Sub tbSearch_TextChanged(sender As Object, e As EventArgs) Handles tbSearch.TextChanged
+        Dim kword As String = tbSearch.Text
+        'If GridDataSource IsNot Nothing Then
+        '    Dim F As DataRow() = GridDataSource.Select($"Person LIKE '%{kword}%'")
+        '    If F IsNot Nothing AndAlso F.Count > 0 Then
+        '        Grid.DataSource = Nothing
+        '        Grid.DataSource = F.CopyToDataTable
+        '    End If
+        'End If
+        BuildGrid(kword)
     End Sub
 
     Public Class ResizeableControl
