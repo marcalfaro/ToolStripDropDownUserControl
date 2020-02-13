@@ -15,6 +15,7 @@ Public Class ucTextDrop2
     Private Sub TextDrop_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         With dgv
+            .AutoGenerateColumns = True
             .Columns.Add("sn", "sn")
             .Columns.Add("sName", "Name")
             .Columns.Add("sAge", "Age")
@@ -30,26 +31,44 @@ Public Class ucTextDrop2
         'dgv.DataSource = GridDataSource
     End Sub
 
-    Private Sub BuildDataTable1()
-        GridDataSource = New DataTable
-        With GridDataSource
-            With .Columns
-                .Add("SN")
-                .Add("First Name")
-                .Add("Second Name")
-            End With
-            For i As Integer = 1 To 5
-                .Rows.Add({i, $"Person {i}", $"Surname {i * 10}"})
-            Next
+    Private Sub InitialiseFormEventCapture(thisControl As Control)
+        'If Not p_Form Is Nothing Then Return 'Already performed
+        If thisControl Is Nothing Then Return
+
+        Dim form As Form = thisControl.FindForm()
+        If form Is Nothing Then Return
+        dgv.BindingContext = form.BindingContext '<=== ADDED
+    End Sub
+
+    Public Sub LoadExternalData(ByVal dt As DataTable)
+        With dgv
+            If .DataSource Is Nothing Then
+                If .Rows.Count > 0 Then .Rows.Clear()
+                If .Columns.Count > 0 Then .Columns.Clear()
+            Else
+                .DataSource = Nothing
+            End If
+
+            .ColumnHeadersVisible = False
+            .DataSource = GridDataSource
+            .ColumnHeadersVisible = True
         End With
     End Sub
 
     Private Sub BuildGrid(ByVal kword As String)
         With dgv
-            .Rows.Clear()
-            For i As Integer = 1 To 5
-                .Rows.Add({i, $"{kword} {i}", $"{kword} {i * 10}"})
-            Next
+            If GridDataSource Is Nothing Then
+                .Rows.Clear()
+                For i As Integer = 1 To 5
+                    .Rows.Add({i, $"{kword} {i}", $"{kword} {i * 10}"})
+                Next
+            Else
+                If .Rows.Count > 0 Then .Rows.Clear()
+                If .Columns.Count > 0 Then .Columns.Clear()
+
+                .DataSource = Nothing
+                .DataSource = GridDataSource
+            End If
         End With
     End Sub
 
@@ -86,12 +105,16 @@ Public Class ucTextDrop2
         sPanel.PerformLayout()
         CType(dgv, System.ComponentModel.ISupportInitialize).EndInit()
 
+
+        Dim frm As Form = FindForm()
+        If frm IsNot Nothing Then
+            dgv.BindingContext = frm.BindingContext
+        End If
+
         Dim tsmiHost As New ToolStripControlHost(sPanel)
         tsmiHost.Margin = New Padding(0)
         tsDropDown.Padding = New Padding(0)
         tsDropDown.Items.Add(tsmiHost)
-
-
     End Sub
 
     Private Sub tsDropDown_Closing(sender As Object, e As ToolStripDropDownClosingEventArgs) Handles tsDropDown.Closing
